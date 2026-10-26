@@ -1,0 +1,55 @@
+[project]
+name = "olfactoconnect"
+version = "0.1.0"
+description = "Reproducible environment and dataset acquisition for the Drosophila olfactory connectome project"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "brian2>=2.10,<3",
+  "caveclient>=8,<9",
+  "flygym @ git+https://github.com/NeLy-EPFL/flygym.git@ca65a510c2afe6ac61c51df4f274c8d190c2f95f",
+  "igraph>=1,<2",
+  "matplotlib>=3.10,<4",
+  "neuprint-python>=0.6,<0.7",
+  "numpy>=2,<3",
+  "pandas>=2.3,<3",
+  "polars>=1,<2",
+  "pyarrow>=20,<26",
+  "python-dotenv>=1,<2",
+  "requests>=2.32,<3",
+  "scipy>=1.15,<2",
+  "seaborn>=0.13,<1",
+  "torch>=2.5,<3",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8,<10",
+  "ruff>=0.12,<1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[build-system]
+requires = ["hatchling>=1.26,<2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/olfactoconnect"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
