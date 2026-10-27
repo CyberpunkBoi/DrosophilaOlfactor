@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 import json
 import os
-from pathlib import Path
 import re
 import tempfile
-from olfactoconnect.data.registry import validate_relative_path, validate_source_url
+from datetime import datetime
+from pathlib import Path
 
+from olfactoconnect.data.registry import validate_relative_path, validate_source_url
 
 MANIFEST_RELATIVE_PATH = Path(".metadata") / "download-manifest.json"
 _REQUIRED_FIELDS = {
@@ -27,7 +27,7 @@ _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 def _validate_file_record(file_record: dict[str, object]) -> dict[str, object]:
     if not isinstance(file_record, dict):
-        raise ValueError("manifest file record must be an object")
+        raise TypeError("manifest file record must be an object")
 
     credential_fields = [
         key
@@ -53,14 +53,14 @@ def _validate_file_record(file_record: dict[str, object]) -> dict[str, object]:
     record["relative_path"] = validate_relative_path(record["relative_path"])
     source_url = record["source_url"]
     if not isinstance(source_url, str):
-        raise ValueError("manifest source_url must be a string")
+        raise TypeError("manifest source_url must be a string")
     validate_source_url(source_url)
 
     timestamp = record["retrieved_at_utc"]
     if not isinstance(timestamp, str):
-        raise ValueError("manifest retrieved_at_utc must be a string")
+        raise TypeError("manifest retrieved_at_utc must be a string")
     try:
-        parsed_timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        parsed_timestamp = datetime.fromisoformat(timestamp)
     except ValueError as error:
         raise ValueError("manifest retrieved_at_utc must be an ISO-8601 timestamp") from error
     if parsed_timestamp.utcoffset() is None or parsed_timestamp.utcoffset().total_seconds() != 0:

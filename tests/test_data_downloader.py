@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 import requests
 
-
 ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = b"connectome-test-payload"
 

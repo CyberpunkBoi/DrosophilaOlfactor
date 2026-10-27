@@ -126,7 +126,7 @@
 - CI on Python 3.12 runs on `windows-2022` and `ubuntu-24.04`, validates the lock, installs the same locked environment, runs Ruff and pytest, and does not download data.
 - `LICENSE` is visibly marked as a non-binding placeholder, not an open-source grant.
 
-- [ ] **Step 1: Write failing repository-contract tests** for README commands, placeholder license wording, required CI commands, absence of Docker configuration, and ignored data/secrets.
+- [ ] **Step 1: Write failing repository-contract tests** that run the actual `--list` script without creating data, inspect the parsed CI job matrix/commands, verify the placeholder is not declared as the selected package license, and exercise Git ignore behavior. Manually check README commands against these tested entry points rather than asserting prose.
 - [ ] **Step 2: Run** `uv run --locked pytest tests/test_repository_contract.py -v`; expect failures.
 - [ ] **Step 3: Implement** docs and CI using the same locked uv commands; keep `PLAN.md` faithful to the agreed stages and mark current work as Stage 0 only.
 - [ ] **Step 4: Run** targeted tests and inspect the workflow syntax; expect PASS.

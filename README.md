@@ -22,19 +22,25 @@ the DM2/DC2 pilot, evaluate G1, or implement a neural model.
 
 ## Create the environment
 
-From the repository root:
+Install `uv` once using the [official instructions](https://docs.astral.sh/uv/getting-started/installation/), then run this from the repository root:
 
 ```powershell
 python scripts/setup_environment.py
 ```
 
 The wrapper checks that `uv` is installed, then runs the project's locked
-sync. It does not download scientific data. The equivalent commands are:
+sync and reports whether a C++ compiler is available. It does not install
+system tools or download scientific data. The equivalent commands are:
 
 ```powershell
 uv lock --check
 uv sync --locked --all-groups
 ```
+
+On macOS/Linux, the same commands work in a terminal. If using Brian2's C++
+standalone backend, install a compiler separately: MSVC Build Tools on
+Windows, Xcode Command Line Tools on macOS, or `g++` on Linux. No compiler is
+required for the NumPy runtime used by the environment smoke test.
 
 Run commands in the project environment without activating it:
 

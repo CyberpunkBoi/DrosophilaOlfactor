@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
-import re
 from urllib.parse import parse_qsl, urlsplit
 
 import yaml
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DATASET_CONFIG = PROJECT_ROOT / "config" / "datasets.yaml"
@@ -30,7 +29,7 @@ def validate_relative_path(relative_path: str) -> str:
 
 def validate_source_url(url: str) -> None:
     if not isinstance(url, str):
-        raise ValueError("dataset source URL must be a string")
+        raise TypeError("dataset source URL must be a string")
     parsed = urlsplit(url)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise ValueError("dataset source URL must use HTTP or HTTPS")
@@ -78,7 +77,7 @@ def _load_dataset_configuration() -> dict[str, object]:
 
     datasets = configuration.get("datasets") if isinstance(configuration, dict) else None
     if not isinstance(datasets, dict):
-        raise ValueError(f"invalid dataset registry: {DATASET_CONFIG}")
+        raise TypeError(f"invalid dataset registry: {DATASET_CONFIG}")
     return datasets
 
 
@@ -97,7 +96,7 @@ def get_dataset_files(name: str) -> tuple[DatasetFile, ...]:
 
     definition = datasets[name]
     if not isinstance(definition, dict) or not isinstance(definition.get("files"), list):
-        raise ValueError(f"invalid registry entry for dataset {name!r}")
+        raise TypeError(f"invalid registry entry for dataset {name!r}")
 
     version = str(definition.get("version", ""))
     citation = str(definition.get("citation", ""))

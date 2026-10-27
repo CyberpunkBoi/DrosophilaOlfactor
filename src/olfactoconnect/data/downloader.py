@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
-from pathlib import Path
 import re
+from datetime import UTC, datetime
+from pathlib import Path
 
 import requests
 
 from olfactoconnect.data.manifest import MANIFEST_RELATIVE_PATH, write_manifest
 from olfactoconnect.data.registry import DatasetFile, get_dataset_files
-
 
 _CONTENT_RANGE = re.compile(r"^bytes (\d+)-(\d+)/(\d+|\*)$")
 _CHUNK_SIZE = 1024 * 1024
@@ -54,7 +53,7 @@ def _record_file(asset: DatasetFile, path: Path, data_dir: Path) -> None:
             "version": asset.version,
             "relative_path": asset.relative_path,
             "source_url": asset.url,
-            "retrieved_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds").replace(
+            "retrieved_at_utc": datetime.now(UTC).isoformat(timespec="seconds").replace(
                 "+00:00", "Z"
             ),
             "size_bytes": path.stat().st_size,

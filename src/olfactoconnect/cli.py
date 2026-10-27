@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import requests
 
 from olfactoconnect.data.downloader import download_dataset
 from olfactoconnect.data.registry import get_dataset_files, list_datasets
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
