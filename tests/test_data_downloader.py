@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import json
 from pathlib import Path
 
 import pytest
@@ -165,6 +166,46 @@ def test_valid_existing_file_is_not_fetched_again(tmp_path: Path) -> None:
 
     assert result == path
     assert result.read_bytes() == PAYLOAD
+
+
+def test_revalidating_existing_file_preserves_original_retrieval_timestamp(
+    tmp_path: Path,
+) -> None:
+    downloader = load_downloader()
+    manifest = importlib.import_module("olfactoconnect.data.manifest")
+    registry = load_registry()
+    asset = registry.DatasetFile(
+        dataset="male-cns-v1.0-core",
+        version="v1.0",
+        relative_path="raw/male-cns-v1.0/connectome-weights.feather",
+        url="https://example.org/connectome-weights.feather",
+        citation="test fixture",
+        expected_size=len(PAYLOAD),
+    )
+    path = tmp_path / asset.relative_path
+    path.parent.mkdir(parents=True)
+    path.write_bytes(PAYLOAD)
+    original_timestamp = "2026-01-02T03:04:05Z"
+    manifest.write_manifest(
+        tmp_path,
+        {
+            "dataset": asset.dataset,
+            "version": asset.version,
+            "relative_path": asset.relative_path,
+            "source_url": asset.url,
+            "retrieved_at_utc": original_timestamp,
+            "size_bytes": len(PAYLOAD),
+            "sha256": hashlib.sha256(PAYLOAD).hexdigest(),
+            "citation": asset.citation,
+        },
+    )
+
+    downloader.download_file(asset, tmp_path, session=FakeSession([]))
+
+    saved = json.loads(
+        (tmp_path / ".metadata" / "download-manifest.json").read_text(encoding="utf-8")
+    )
+    assert saved["files"][0]["retrieved_at_utc"] == original_timestamp
 
 
 def test_existing_invalid_file_requires_force(tmp_path: Path) -> None:

@@ -88,6 +88,7 @@ def test_dataset_file_rejects_paths_outside_data_root(relative_path: str) -> Non
         "https://user:secret@example.org/file",
         "https://example.org/file?token=should-not-be-embedded",
         "https://example.org/file?api_key=should-not-be-embedded",
+        "https://example.org/file?X-Amz-Credential=signed&X-Amz-Signature=secret",
     ],
 )
 def test_dataset_file_rejects_credentials_embedded_in_source_url(url: str) -> None:

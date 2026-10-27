@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from urllib.parse import parse_qsl, urlsplit
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -35,12 +35,8 @@ def validate_source_url(url: str) -> None:
         raise ValueError("dataset source URL must use HTTP or HTTPS")
     if parsed.username is not None or parsed.password is not None:
         raise ValueError("dataset source URL must not contain credentials")
-    sensitive_names = ("token", "api_key", "apikey", "password", "secret", "authorization")
-    if any(
-        any(sensitive_name in key.casefold().replace("-", "_") for sensitive_name in sensitive_names)
-        for key, _ in parse_qsl(parsed.query, keep_blank_values=True)
-    ):
-        raise ValueError("dataset source URL must not contain credentials")
+    if parsed.query:
+        raise ValueError("dataset source URL query parameters may contain credentials")
 
 
 @dataclass(frozen=True, slots=True)

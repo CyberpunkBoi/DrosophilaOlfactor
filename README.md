@@ -13,7 +13,8 @@ the DM2/DC2 pilot, evaluate G1, or implement a neural model.
 ## Requirements
 
 - Windows 10/11, macOS, or 64-bit Linux
-- Python 3.12 (the project is locked to `>=3.12,<3.13`)
+- The project runtime is Python 3.12 (`.python-version` and `requires-python`); `uv` installs that runtime if needed
+- Python 3.10+ only if invoking `python scripts/setup_environment.py`; otherwise use `uv sync` directly
 - [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
 - Git
 - Internet access for installing packages and explicitly requested data
@@ -74,7 +75,9 @@ The downloader stores files under `data/`, resumes interrupted transfers
 when the source supports HTTP range requests, validates available size and
 checksum information, and writes local provenance metadata. Downloads are
 never part of environment setup, tests, or CI. Raw data and generated
-manifests are ignored by Git; see [`data/README.md`](data/README.md).
+manifests are ignored by Git; see [`data/README.md`](data/README.md). You may
+pass `--data-dir` to store payloads outside the repository; paths inside the
+repository are restricted to `data/` so they cannot be accidentally staged.
 
 Hemibrain v1.2.1 and FlyWire v783 use the neuPrint and CAVE APIs. The Python
 clients are installed in the same environment, but exporting those data is

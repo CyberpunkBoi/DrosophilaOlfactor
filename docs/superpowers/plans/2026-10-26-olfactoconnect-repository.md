@@ -22,9 +22,9 @@
 
 ## Review Focus
 
-- **Python/platform mismatch:** Setup must reject an unsupported Python version with a clear message; test the declared 3.12 range and wrapper's error path.
+- **Python/platform mismatch:** uv must create the project environment at Python 3.12 from `.python-version` and `requires-python`; the bootstrap wrapper may itself run under another compatible system Python. Test the actual environment version.
 - **Dependency drift:** CI and setup must fail rather than rewrite a stale lock; test `uv lock --check` and use `uv sync --locked`.
-- **Unknown dataset or unsafe destination:** The CLI must reject unknown dataset names and paths escaping `data/`; test both without network access.
+- **Unknown dataset or unsafe destination:** The CLI must reject unknown dataset names, paths escaping `data/`, and data roots inside the repository but outside `data/`; test all without network access.
 - **Truncated/corrupt response:** A failed size/hash check must not leave a valid-looking final file; test incorrect size, incorrect digest, and interrupted transfer.
 - **Pre-existing files and secrets:** Valid data must not be overwritten without `--force`; `.env` and generated manifests must remain untracked. Test the overwrite rule and Git ignore patterns.
 
@@ -106,9 +106,10 @@
 - `download_file(asset: DatasetFile, data_dir: Path, *, force: bool = False, session: requests.Session | None = None) -> Path` streams to a temporary `.part` file, resumes via HTTP Range/206 when supported, validates full published size and known SHA-256, atomically renames only after validation, and preserves an existing valid file unless `force=True`.
 - `download_dataset(name: str, data_dir: Path, *, force: bool = False, session: requests.Session | None = None) -> list[Path]` downloads only the named dataset and records a manifest for each completed file.
 - CLI: `python scripts/download_data.py --list`; `python scripts/download_data.py --dataset door-v2.0.1`; `python scripts/download_data.py --dataset male-cns-v1.0-core`.
+- Optional `--data-dir` may point outside the repository; a path inside the repository is accepted only beneath `data/`.
 - Setup, import, and tests never invoke this CLI implicitly. Authenticated hemibrain/FlyWire query export is explicitly deferred until cell/ROI selection is specified; clients and credential names are documented but no broad query is run.
 
-- [ ] **Step 1: Write failing mocked-HTTP tests** for successful download, interrupted transfer leaving a partial file, resuming with a valid 206/Content-Range response, restarting when a server ignores Range, already-present files, `--force`, wrong size, wrong SHA-256, HTTP failure, no network for `--list`, and unknown dataset.
+- [ ] **Step 1: Write failing mocked-HTTP tests** for successful download, interrupted transfer leaving a partial file, resuming with a valid 206/Content-Range response, restarting when a server ignores Range, already-present files, `--force`, wrong size, wrong SHA-256, HTTP failure, no network for `--list`, unknown dataset, and refusing a data root inside the repository but outside `data/`.
 - [ ] **Step 2: Run** `uv run --locked pytest tests/test_data_downloader.py tests/test_data_cli.py -v`; expect failures.
 - [ ] **Step 3: Implement** streaming/resumable download, checksum/size validation, atomic finalization, manifest updates, explicit selection, and readable CLI errors. Preserve partial bytes only after transport interruption; discard them after content-integrity failure. Never contact real endpoints in unit tests.
 - [ ] **Step 4: Run** targeted tests; expect PASS. Do not invoke the download command against real datasets.

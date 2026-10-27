@@ -57,3 +57,20 @@ def test_unknown_dataset_returns_error_without_downloading(capsys) -> None:
 
     assert cli.main(["--dataset", "not-a-dataset"]) == 2
     assert "door-v2.0.1" in capsys.readouterr().err
+
+
+def test_cli_refuses_a_data_root_that_would_write_into_repository(monkeypatch, capsys) -> None:
+    cli = load_cli()
+    observed: list[tuple[object, object]] = []
+
+    def fake_download(name, data_dir, *, force=False):
+        observed.append((name, data_dir))
+        return []
+
+    monkeypatch.setattr(cli, "download_dataset", fake_download)
+
+    result = cli.main(["--dataset", "door-v2.0.1", "--data-dir", str(ROOT)])
+
+    assert result == 2
+    assert observed == []
+    assert "inside the repository" in capsys.readouterr().err

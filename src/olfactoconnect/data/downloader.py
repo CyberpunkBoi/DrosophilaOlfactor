@@ -26,7 +26,7 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _manifest_sha256(data_dir: Path, relative_path: str) -> tuple[int, str] | None:
+def _manifest_record(data_dir: Path, asset: DatasetFile) -> dict[str, object] | None:
     manifest_path = data_dir / MANIFEST_RELATIVE_PATH
     if not manifest_path.is_file():
         return None
@@ -37,11 +37,15 @@ def _manifest_sha256(data_dir: Path, relative_path: str) -> tuple[int, str] | No
     if not isinstance(manifest, dict) or not isinstance(manifest.get("files"), list):
         return None
     for record in manifest["files"]:
-        if isinstance(record, dict) and record.get("relative_path") == relative_path:
-            size_bytes = record.get("size_bytes")
-            sha256 = record.get("sha256")
-            if isinstance(size_bytes, int) and isinstance(sha256, str):
-                return size_bytes, sha256
+        if (
+            isinstance(record, dict)
+            and record.get("relative_path") == asset.relative_path
+            and record.get("dataset") == asset.dataset
+            and record.get("version") == asset.version
+            and record.get("source_url") == asset.url
+            and record.get("citation") == asset.citation
+        ):
+            return record
     return None
 
 
@@ -72,8 +76,10 @@ def _matches_integrity(asset: DatasetFile, path: Path, data_dir: Path) -> bool:
     if asset.expected_sha256 is not None:
         return digest == asset.expected_sha256
 
-    recorded = _manifest_sha256(data_dir, asset.relative_path)
-    return recorded == (size_bytes, digest)
+    recorded = _manifest_record(data_dir, asset)
+    return recorded is not None and recorded.get("size_bytes") == size_bytes and recorded.get(
+        "sha256"
+    ) == digest
 
 
 def _parse_content_range(value: str | None, offset: int) -> tuple[int, int | None]:
@@ -108,7 +114,13 @@ def _download_with_session(
 
     if destination.exists() and not force:
         if _matches_integrity(asset, destination, data_dir):
-            _record_file(asset, destination, data_dir)
+            record = _manifest_record(data_dir, asset)
+            if (
+                record is None
+                or record.get("size_bytes") != destination.stat().st_size
+                or record.get("sha256") != _file_sha256(destination)
+            ):
+                _record_file(asset, destination, data_dir)
             return destination
         raise FileExistsError(
             f"{destination} exists but fails integrity checks; pass --force to replace it"
