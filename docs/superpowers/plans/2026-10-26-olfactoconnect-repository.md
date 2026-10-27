@@ -76,6 +76,7 @@
 - Create: `src/olfactoconnect/data/registry.py`
 - Create: `src/olfactoconnect/data/manifest.py`
 - Create: `config/datasets.yaml`
+- Modify: `pyproject.toml` (declare PyYAML as a direct dependency)
 - Test: `tests/test_data_registry.py`
 - Test: `tests/test_data_manifest.py`
 

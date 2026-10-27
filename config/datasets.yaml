@@ -1,0 +1,27 @@
+datasets:
+  door-v2.0.1:
+    version: "2.0.1"
+    citation: "Münch, D. & Galizia, C.G. (2016). DoOR 2.0. Scientific Reports 6, 21841."
+    files:
+      - relative_path: "external/door-v2.0.1/door_response_matrix.csv"
+        url: "https://raw.githubusercontent.com/ropensci/DoOR.data/v2.0.1/data/door_response_matrix.csv"
+        expected_size: 296409
+        expected_sha256: "5035dcbed5ffdb3b42c1df0c01d0526f7ed3fa0f8928eabfcd2279ea80ddb348"
+      - relative_path: "external/door-v2.0.1/door_mappings.csv"
+        url: "https://raw.githubusercontent.com/ropensci/DoOR.data/v2.0.1/data/door_mappings.csv"
+        expected_size: 12824
+        expected_sha256: "1197c492e769b1b587c907c5b750ffa2507d7e6c9fe9dfcb2ee8603871e00912"
+
+  male-cns-v1.0-core:
+    version: "v1.0"
+    citation: "Berg et al. (2025). Sexual dimorphism in the complete connectome of the Drosophila male central nervous system."
+    files:
+      - relative_path: "raw/male-cns-v1.0/body-annotations-male-cns-v1.0-minconf-0.5.feather"
+        url: "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-annotations-male-cns-v1.0-minconf-0.5.feather"
+        expected_size: 14483314
+      - relative_path: "raw/male-cns-v1.0/body-neurotransmitters-male-cns-v1.0.feather"
+        url: "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/body-neurotransmitters-male-cns-v1.0.feather"
+        expected_size: 43282834
+      - relative_path: "raw/male-cns-v1.0/connectome-weights-male-cns-v1.0-minconf-0.5.feather"
+        url: "https://storage.googleapis.com/flyem-male-cns/v1.0/connectome-data/flat-connectome/connectome-weights-male-cns-v1.0-minconf-0.5.feather"
+        expected_size: 1051241946
