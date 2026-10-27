@@ -72,14 +72,24 @@ class DatasetFile:
             raise ValueError("expected SHA-256 must be 64 lowercase hexadecimal characters")
 
 
-def get_dataset_files(name: str) -> tuple[DatasetFile, ...]:
-    """Load the registered static files for one exact dataset identifier."""
+def _load_dataset_configuration() -> dict[str, object]:
     with DATASET_CONFIG.open("r", encoding="utf-8") as source_file:
         configuration = yaml.safe_load(source_file)
 
     datasets = configuration.get("datasets") if isinstance(configuration, dict) else None
     if not isinstance(datasets, dict):
         raise ValueError(f"invalid dataset registry: {DATASET_CONFIG}")
+    return datasets
+
+
+def list_datasets() -> tuple[str, ...]:
+    """Return the supported static dataset identifiers without network access."""
+    return tuple(sorted(_load_dataset_configuration()))
+
+
+def get_dataset_files(name: str) -> tuple[DatasetFile, ...]:
+    """Load the registered static files for one exact dataset identifier."""
+    datasets = _load_dataset_configuration()
 
     if name not in datasets:
         available = ", ".join(sorted(datasets))
